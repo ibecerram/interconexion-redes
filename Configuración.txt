@@ -1,11 +1,18 @@
 
      ***  CONFIGURACIÓN DE LA RED LAN  ***
 
-a) Configuración básica en todos los dispositivos
 
 ------------------------------------------------------------
 
-b) VLANs
+
+     +++  Configuración básica  +++
+
+
+
+------------------------------------------------------------
+
+
+     +++  Configuración de VLANs  +++
 
   1. Crear las VLANs
 
@@ -141,6 +148,33 @@ network 172.28.0.64 255.255.255.224
 default-router 172.28.0.94
 dns 192.168.0.14
 
+   >> MARKETING: 
+
+ip dhcp excluded-address 172.28.0.126
+
+ip dhcp pool MARKETING
+network 172.28.0.96 255.255.255.224
+default-router 172.28.0.126
+dns 192.168.0.14
+
+   >> CONFERENCIAS: 
+
+ip dhcp excluded-address 172.28.0.222
+
+ip dhcp pool MARKETING
+network 172.28.0.192 255.255.255.224
+default-router 172.28.0.222
+dns 192.168.0.14
+
+   >> ADMINISTRACION: 
+
+ip dhcp excluded-address 172.28.0.62
+
+ip dhcp pool MARKETING
+network 172.28.0.32 255.255.255.224
+default-router 172.28.0.62
+dns 192.168.0.14
+
 
 
 ------------------------------------------------------------
@@ -248,7 +282,7 @@ int g0/0/1
 ip address 172.28.1.6 255.255.255.252
 no shut
 
-int s0/2/0
+int g0/0/0
 ip address 192.168.0.17 255.255.255.252
 no shut
 
@@ -259,18 +293,18 @@ int g0/0/0
 ip address 172.28.1.10 255.255.255.252
 no shut
 
-int s0/2/0
+int g0/0/1
 ip address 192.168.0.21 255.255.255.252
 no shut
 
  
  >> R-ISP
 
-int s3/0
+int f6/0
 ip address 192.168.0.18 255.255.255.252
 no shut
 
-int s2/0
+int f1/0
 ip address 192.168.0.22 255.255.255.252
 no shut
 
@@ -284,77 +318,329 @@ no shut
 
 
 
-     +++  OSPF  +++
-/27: 255.255.255.224 - 0.0.0.31
-/30: 255.255.255.252 - 0.0.0.3
+     +++  Enrutamiento  +++
 
- >> MULTICAPA
+ >> R-ISP
 
-router ospf 10
-network 172.28.0.0 0.0.0.31 area 1
-network 172.28.0.64 0.0.0.31 area 1
-network 172.28.0.128 0.0.0.31 area 1
-network 172.28.0.240 0.0.0.3 area 1
-network 172.28.0.244 0.0.0.3 area 1
-network 172.28.0.248 0.0.0.3 area 1
-network 172.28.0.252 0.0.0.3 area 1
-network 172.28.1.0 0.0.0.3 area 1
-network 172.28.1.4 0.0.0.3 area 1
-network 172.28.1.8 0.0.0.3 area 1
+no ip route 172.28.0.0 255.255.255.224 s2/0
+no ip route 172.28.0.32 255.255.255.224 s2/0
+no ip route 172.28.0.64 255.255.255.224 s2/0
+no ip route 172.28.0.96 255.255.255.224 s2/0
+no ip route 172.28.0.128 255.255.255.224 s2/0
+no ip route 172.28.0.160 255.255.255.224 s2/0
+no ip route 172.28.0.192 255.255.255.224 s2/0
+no ip route 172.28.0.224 255.255.255.240 s2/0
+no ip route 172.28.0.240 255.255.255.252 s2/0
+no ip route 172.28.0.244 255.255.255.252 s2/0
+no ip route 172.28.0.248 255.255.255.252 s2/0
+no ip route 172.28.0.252 255.255.255.252 s2/0
+no ip route 172.28.1.0 255.255.255.252 s2/0
+no ip route 172.28.1.4 255.255.255.252 s2/0
+no ip route 172.28.1.8 255.255.255.252 s2/0
+no ip route 172.28.1.12 255.255.255.252 s2/0
 
-
- >> CONFERENCIAS
-
-router ospf 10
-network 172.28.0.192 0.0.0.31 area 1
-network 172.28.0.240 0.0.0.3 area 1
+no ip route 192.168.0.0 255.255.255.248 s2/0
 
 
- >> SERVIDORES
+ip route 172.28.0.0 255.255.255.224 f6/0
+ip route 172.28.0.32 255.255.255.224 f6/0
+ip route 172.28.0.64 255.255.255.224 f6/0
+ip route 172.28.0.96 255.255.255.224 f6/0
+ip route 172.28.0.128 255.255.255.224 f6/0
+ip route 172.28.0.160 255.255.255.224 f6/0
+ip route 172.28.0.192 255.255.255.224 f6/0
+ip route 172.28.0.224 255.255.255.240 f6/0
+ip route 172.28.0.240 255.255.255.252 f6/0
+ip route 172.28.0.244 255.255.255.252 f6/0
+ip route 172.28.0.248 255.255.255.252 f6/0
+ip route 172.28.0.252 255.255.255.252 f6/0
+ip route 172.28.1.0 255.255.255.252 f6/0
+ip route 172.28.1.4 255.255.255.252 f6/0
+ip route 172.28.1.8 255.255.255.252 f6/0
+ip route 172.28.1.12 255.255.255.252 f6/0
 
-router ospf 10
-network 172.28.0.224 0.0.0.15 area 1
-network 172.28.0.244 0.0.0.3 area 1
+ip route 192.168.0.0 255.255.255.248 f6/0
 
 
- >> MARKETING
+ >> R-RESPALDO
 
-router ospf 10
-network 172.28.0.96 0.0.0.31 area 1
-network 172.28.0.248 0.0.0.3 area 1
+ip route 172.28.0.0 255.255.255.224 g0/0/0
+ip route 172.28.0.32 255.255.255.224 g0/0/0
+ip route 172.28.0.64 255.255.255.224 g0/0/0
+ip route 172.28.0.96 255.255.255.224 g0/0/0
+ip route 172.28.0.128 255.255.255.224 g0/0/0
+ip route 172.28.0.160 255.255.255.224 g0/0/0
+ip route 172.28.0.192 255.255.255.224 g0/0/0
+ip route 172.28.0.224 255.255.255.240 g0/0/0
+ip route 172.28.0.240 255.255.255.252 g0/0/0
+ip route 172.28.0.244 255.255.255.252 g0/0/0
+ip route 172.28.0.248 255.255.255.252 g0/0/0
+ip route 172.28.0.252 255.255.255.252 g0/0/0
+ip route 172.28.1.0 255.255.255.252 g0/0/0
+ip route 172.28.1.4 255.255.255.252 g0/0/0
+ip route 172.28.1.12 255.255.255.252 g0/0/0
 
+ip route 192.168.0.0 255.255.255.248 g0/0/1
+ip route 192.168.0.8 255.255.255.248 g0/0/1
+ip route 192.168.0.16 255.255.255.252 g0/0/1
+
+
+ >> R-ACTIVO
+
+ip route 172.28.0.0 255.255.255.224 g0/0/1
+ip route 172.28.0.32 255.255.255.224 g0/0/1
+ip route 172.28.0.64 255.255.255.224 g0/0/1
+ip route 172.28.0.96 255.255.255.224 g0/0/1
+ip route 172.28.0.128 255.255.255.224 g0/0/1
+ip route 172.28.0.160 255.255.255.224 g0/0/1
+ip route 172.28.0.192 255.255.255.224 g0/0/1
+ip route 172.28.0.224 255.255.255.240 g0/0/1
+ip route 172.28.0.240 255.255.255.252 g0/0/1
+ip route 172.28.0.244 255.255.255.252 g0/0/1
+ip route 172.28.0.248 255.255.255.252 g0/0/1
+ip route 172.28.0.252 255.255.255.252 g0/0/1
+ip route 172.28.1.0 255.255.255.252 g0/0/1
+ip route 172.28.1.8 255.255.255.252 g0/0/1
+ip route 172.28.1.12 255.255.255.252 g0/0/1
+
+ip route 192.168.0.0 255.255.255.248 g0/0/0
+ip route 192.168.0.8 255.255.255.248 g0/0/0
+ip route 192.168.0.20 255.255.255.252 g0/0/0
+
+
+ >> R-ADMINISTRACION
+
+ip route 172.28.0.0 255.255.255.224 g0/0/0
+ip route 172.28.0.64 255.255.255.224 g0/0/0
+ip route 172.28.0.96 255.255.255.224 g0/0/0
+ip route 172.28.0.128 255.255.255.224 g0/0/0
+ip route 172.28.0.160 255.255.255.224 g0/0/0
+ip route 172.28.0.192 255.255.255.224 g0/0/0
+ip route 172.28.0.224 255.255.255.240 g0/0/0
+ip route 172.28.0.240 255.255.255.252 g0/0/0
+ip route 172.28.0.244 255.255.255.252 g0/0/0
+ip route 172.28.0.248 255.255.255.252 g0/0/0
+ip route 172.28.0.252 255.255.255.252 g0/0/0
+ip route 172.28.1.4 255.255.255.252 g0/0/0
+ip route 172.28.1.8 255.255.255.252 g0/0/0
+ip route 172.28.1.12 255.255.255.252 g0/0/0
+
+ip route 192.168.0.0 255.255.255.248 g0/0/0
+ip route 192.168.0.8 255.255.255.248 g0/0/0
+ip route 192.168.0.16 255.255.255.252 g0/0/0
+ip route 192.168.0.20 255.255.255.252 g0/0/0
+
+ip route 172.28.1.12 255.255.255.252 g0/0/0
+
+
+ >> R-MARKETING
+
+ip route 172.28.0.0 255.255.255.224 g0/0/0
+ip route 172.28.0.32 255.255.255.224 g0/0/0
+ip route 172.28.0.64 255.255.255.224 g0/0/0
+ip route 172.28.0.128 255.255.255.224 g0/0/0
+ip route 172.28.0.160 255.255.255.224 g0/0/0
+ip route 172.28.0.192 255.255.255.224 g0/0/0
+ip route 172.28.0.224 255.255.255.240 g0/0/0
+ip route 172.28.0.240 255.255.255.252 g0/0/0
+ip route 172.28.0.244 255.255.255.252 g0/0/0
+ip route 172.28.0.252 255.255.255.252 g0/0/0
+ip route 172.28.1.0 255.255.255.252 g0/0/0
+ip route 172.28.1.4 255.255.255.252 g0/0/0
+ip route 172.28.1.8 255.255.255.252 g0/0/0
+ip route 172.28.1.12 255.255.255.252 g0/0/0
+
+ip route 192.168.0.0 255.255.255.248 g0/0/0
+ip route 192.168.0.8 255.255.255.248 g0/0/0
+ip route 192.168.0.16 255.255.255.252 g0/0/0
+ip route 192.168.0.20 255.255.255.252 g0/0/0
+
+ip route 172.28.1.12 255.255.255.252 g0/0/0
+
+
+ >> R-SERVIDORES
+
+ip route 172.28.0.0 255.255.255.224 g0/0/0
+ip route 172.28.0.32 255.255.255.224 g0/0/0
+ip route 172.28.0.64 255.255.255.224 g0/0/0
+ip route 172.28.0.96 255.255.255.224 g0/0/0
+ip route 172.28.0.128 255.255.255.224 g0/0/0
+ip route 172.28.0.160 255.255.255.224 g0/0/0
+ip route 172.28.0.192 255.255.255.224 g0/0/0
+ip route 172.28.0.240 255.255.255.252 g0/0/0
+ip route 172.28.0.248 255.255.255.252 g0/0/0
+ip route 172.28.0.252 255.255.255.252 g0/0/0
+ip route 172.28.1.0 255.255.255.252 g0/0/0
+ip route 172.28.1.4 255.255.255.252 g0/0/0
+ip route 172.28.1.8 255.255.255.252 g0/0/0
+ip route 172.28.1.12 255.255.255.252 g0/0/0
+
+ip route 192.168.0.0 255.255.255.248 g0/0/0
+ip route 192.168.0.8 255.255.255.248 g0/0/0
+ip route 192.168.0.16 255.255.255.252 g0/0/0
+ip route 192.168.0.20 255.255.255.252 g0/0/0
+
+ip route 172.28.1.12 255.255.255.252 g0/0/0
+
+
+ >> R-CONFERENCIAS
+
+ip route 172.28.0.0 255.255.255.224 f0/0
+ip route 172.28.0.32 255.255.255.224 f0/0
+ip route 172.28.0.64 255.255.255.224 f0/0
+ip route 172.28.0.96 255.255.255.224 f0/0
+ip route 172.28.0.128 255.255.255.224 f0/0
+ip route 172.28.0.160 255.255.255.224 f0/0
+ip route 172.28.0.224 255.255.255.240 f0/0
+ip route 172.28.0.244 255.255.255.252 f0/0
+ip route 172.28.0.248 255.255.255.252 f0/0
+ip route 172.28.0.252 255.255.255.252 f0/0
+ip route 172.28.1.0 255.255.255.252 f0/0
+ip route 172.28.1.4 255.255.255.252 f0/0
+ip route 172.28.1.8 255.255.255.252 f0/0
+ip route 172.28.1.12 255.255.255.252 f0/0
+
+ip route 192.168.0.0 255.255.255.248 f0/0
+ip route 192.168.0.8 255.255.255.248 f0/0
+ip route 192.168.0.16 255.255.255.252 f0/0
+ip route 192.168.0.20 255.255.255.252 f0/0
+
+ip route 172.28.1.12 255.255.255.252 f0/0
+
+
+ >> CORE
+
+ip route 172.28.0.32 255.255.255.224 172.28.1.2
+ip route 172.28.0.96 255.255.255.224 172.28.0.250
+ip route 172.28.0.160 255.255.255.224 f0/10
+ip route 172.28.0.192 255.255.255.224 172.28.0.242
+ip route 172.28.0.224 255.255.255.240 172.28.0.246 
+
+ip route 192.168.0.8 255.255.255.248 172.28.1.6
+ip route 192.168.0.16 255.255.255.252 172.28.1.6
+ip route 192.168.0.20 255.255.255.252 172.28.1.10
+
+ip route 172.28.1.12 255.255.255.252 g0/2
 
 
 
 ------------------------------------------------------------
 
-c) Seguridad de puerto
+
+
+   +++  Etherchannel - LACP  +++
+
+
+ >> INFORMÁTICA - PRODUCCIÓN Y TELECOMUNICACIONES
+
+int range f0/15-16
+channel-group 1 mode active
+
+int port-channel 1
+sw mode trunk
+sw trunk native vlan 110
+sw trunk allowed vlan 110
+
+
 
 ------------------------------------------------------------
 
-d) Enlaces redundantes donde se requiera
+
+
+     +++  Spanning Tree Protocol  +++
+
+
+ >> CORE
+
+spa vlan 10,15,20,100,110 priority 4096
+
+
+ >> SW-INFORMATICA
+
+spa vlan 10,15,20,100,110 priority 8192
+
+
+ >> SW-PRODUCCION
+
+spa vlan 10,15,20,100,110 priority 12288
+
+
 
 ------------------------------------------------------------
 
-e) EtherChannel
+
+
+     +++  Seguridad de puerto  +++
+
+
+ >> SW-SERVIDORES
+
+int range f0/22-24
+sw mode access
+sw port-security
+sw port-security maximum 1
+sw port-security violation shutdown
+
+
+ >> SW-CONFERENCIAS
+
+int range f0/1-9
+sw mode access
+sw port-security
+sw port-security maximum 2
+sw port-security mac-address sticky
+sw port-security violation protect
+
+
+ >> SW-ISP
+
+int range f0/1-2
+sw mode access
+sw port-security
+sw port-security maximum 1
+sw port-security violation shutdown
+
+
 
 ------------------------------------------------------------
 
-f) Spanning-Tree (Puente raíz, puertos designados y no designados, port fast)
 
-------------------------------------------------------------
 
-g) Enrutamiento entre VLANs
+     +++  Configuración de enlace principal y de respaldo  +++
 
-------------------------------------------------------------
 
-h) Switch multicapa
+ >> R-ACTIVO
 
-------------------------------------------------------------
+int g0/0/0
+standby version 2
+standby 2 ip 172.28.0.237
+standby 2 priority 120
+standby 2 preempt
 
-i) Habilitar el acceso remoto de los dispositivos de red, cuidando rigurosamente la seguridad de los mismos
 
-------------------------------------------------------------
+ >> R-RESPALDO
+
+int g0/0/1
+standby version 2
+standby 2 ip 172.28.0.237
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
