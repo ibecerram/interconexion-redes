@@ -1,0 +1,361 @@
+
+     ***  CONFIGURACIÓN DE LA RED LAN  ***
+
+a) Configuración básica en todos los dispositivos
+
+------------------------------------------------------------
+
+b) VLANs
+
+  1. Crear las VLANs
+
+vlan 10
+name INFORMATICA
+vlan 15
+name PRODUCCION
+vlan 20
+name FINANZAS
+vlan 100
+name ADMIN
+vlan 110
+name NATIVE
+
+
+  2. Asignar puertos
+
+   >> Informática:  
+
+int range f0/1-9,f0/22-24
+sw mode access
+sw access vlan 10
+
+
+   >> Producción y telecomunicaciones:
+
+int range f0/1-12,f0/22-24
+sw mode access
+sw access vlan 15
+
+
+   >> Finanzas: 
+
+int range f0/1-15
+sw mode access
+sw access vlan 20
+
+
+  3. Configurar enlaces troncales
+
+   >> Multicapa: 
+
+int range f0/1-6
+sw trunk NATIVE vlan 110
+sw trunk allowed vlan 10,15,20,100,110
+sw trunk encapsulation dot1q
+sw mode trunk
+
+   >> Departamentos: 
+
+int range g0/1-2
+sw mode trunk
+sw trunk NATIVE vlan 110
+sw trunk allowed vlan 10,15,20,100,110
+sw nonegotiate
+
+
+  4. Configurar direccionamiento IP
+
+   >> Multicapa: 
+
+int vlan 10
+ip address 172.28.0.30 255.255.255.224
+no shut
+
+int vlan 15
+ip address 172.28.0.158 255.255.255.224
+no shut
+
+int vlan 20
+ip address 172.28.0.94 255.255.255.224
+no shut
+
+int vlan 100
+ip address 192.168.0.6 255.255.255.248
+no shut
+
+   >> Switch-Informática:
+
+int vlan 100
+ip address 192.168.0.1 255.255.255.248
+no shut
+ip default-gateway 192.168.0.6
+
+   >> Switch-Producción:
+
+int vlan 100
+ip address 192.168.0.2 255.255.255.248
+no shut
+ip default-gateway 192.168.0.6
+
+   >> Switch-Finanzas: 
+
+int vlan 100
+ip address 192.168.0.3 255.255.255.248
+no shut
+ip default-gateway 192.168.0.6
+
+
+  5. Enrutamiento entre VLANs
+
+ >> Multicapa:
+
+ip routing
+
+
+  6. Direccionamiento con DHCP:
+
+   >> INFORMÁTICA:
+
+ip dhcp excluded-address 172.28.0.30
+
+ip dhcp pool VLAN10
+network 172.28.0.0 255.255.255.224
+default-router 172.28.0.30
+dns 192.168.0.14
+
+   >> PRODUCCIÓN: 
+
+ip dhcp excluded-address 172.28.0.158
+
+ip dhcp pool VLAN15
+network 172.28.0.128 255.255.255.224
+default-router 172.28.0.158
+dns 192.168.0.14
+
+   >> FINANZAS: 
+
+ip dhcp excluded-address 172.28.0.94
+
+ip dhcp pool VLAN20
+network 172.28.0.64 255.255.255.224
+default-router 172.28.0.94
+dns 192.168.0.14
+
+
+
+------------------------------------------------------------
+
+
+
+     +++  Configuraciones PP  +++
+
+ >> R-CONFERENCIAS
+
+int f0/0
+ip address 172.28.0.242 255.255.255.252
+no shut
+
+int f0/1
+ip address 172.28.0.222 255.255.255.224
+no shut
+
+
+ >> R-SERVIDORES
+
+int g0/0/0
+ip address 172.28.0.246 255.255.255.252
+no shut
+
+int g0/0/1
+ip address 172.28.0.238 255.255.255.240
+no shut
+
+
+ >> R-MARKETING
+
+int g0/0/0
+ip address 172.28.0.250 255.255.255.252
+no shut
+
+int g0/0/1
+ip address 172.28.0.126 255.255.255.224
+no shut
+
+
+ >> R-VENTAS (PENDIENTE)
+
+int g0/1
+ip address 172.28.0.254 255.255.255.252
+no shut
+
+int g0/2
+ip address 172.28.0.190 255.255.255.224
+no shut
+
+
+ >> R-ADMINISTRACION
+
+int g0/0/0
+ip address 172.28.1.2 255.255.255.252
+no shut
+
+int g0/0/1
+ip address 172.28.0.62 255.255.255.224
+no shut
+
+
+ >> MULTICAPA
+
+int f0/13
+no sw
+ip address 172.28.0.241 255.255.255.252
+no shut
+
+int f0/11
+no sw
+ip address 172.28.0.245 255.255.255.252
+no shut
+
+int f0/9
+no sw
+ip address 172.28.0.249 255.255.255.252
+no shut
+
+int f0/10
+no sw
+ip address 172.28.0.253 255.255.255.252
+no shut
+
+int f0/8
+no sw
+ip address 172.28.1.1 255.255.255.252
+no shut
+
+int g0/2
+no sw
+ip address 172.28.1.5 255.255.255.252
+no shut
+
+int g0/1
+no sw
+ip address 172.28.1.9 255.255.255.252
+no shut
+
+
+ >> R-ACTIVO
+
+int g0/0/1
+ip address 172.28.1.6 255.255.255.252
+no shut
+
+int s0/2/0
+ip address 192.168.0.17 255.255.255.252
+no shut
+
+
+ >> R-RESPALDO
+
+int g0/0/0
+ip address 172.28.1.10 255.255.255.252
+no shut
+
+int s0/2/0
+ip address 192.168.0.21 255.255.255.252
+no shut
+
+ 
+ >> R-ISP
+
+int s3/0
+ip address 192.168.0.18 255.255.255.252
+no shut
+
+int s2/0
+ip address 192.168.0.22 255.255.255.252
+no shut
+
+int f0/0
+ip address 192.168.0.14 255.255.255.248
+no shut
+
+
+
+------------------------------------------------------------
+
+
+
+     +++  OSPF  +++
+/27: 255.255.255.224 - 0.0.0.31
+/30: 255.255.255.252 - 0.0.0.3
+
+ >> MULTICAPA
+
+router ospf 10
+network 172.28.0.0 0.0.0.31 area 1
+network 172.28.0.64 0.0.0.31 area 1
+network 172.28.0.128 0.0.0.31 area 1
+network 172.28.0.240 0.0.0.3 area 1
+network 172.28.0.244 0.0.0.3 area 1
+network 172.28.0.248 0.0.0.3 area 1
+network 172.28.0.252 0.0.0.3 area 1
+network 172.28.1.0 0.0.0.3 area 1
+network 172.28.1.4 0.0.0.3 area 1
+network 172.28.1.8 0.0.0.3 area 1
+
+
+ >> CONFERENCIAS
+
+router ospf 10
+network 172.28.0.192 0.0.0.31 area 1
+network 172.28.0.240 0.0.0.3 area 1
+
+
+ >> SERVIDORES
+
+router ospf 10
+network 172.28.0.224 0.0.0.15 area 1
+network 172.28.0.244 0.0.0.3 area 1
+
+
+ >> MARKETING
+
+router ospf 10
+network 172.28.0.96 0.0.0.31 area 1
+network 172.28.0.248 0.0.0.3 area 1
+
+
+
+
+------------------------------------------------------------
+
+c) Seguridad de puerto
+
+------------------------------------------------------------
+
+d) Enlaces redundantes donde se requiera
+
+------------------------------------------------------------
+
+e) EtherChannel
+
+------------------------------------------------------------
+
+f) Spanning-Tree (Puente raíz, puertos designados y no designados, port fast)
+
+------------------------------------------------------------
+
+g) Enrutamiento entre VLANs
+
+------------------------------------------------------------
+
+h) Switch multicapa
+
+------------------------------------------------------------
+
+i) Habilitar el acceso remoto de los dispositivos de red, cuidando rigurosamente la seguridad de los mismos
+
+------------------------------------------------------------
+
+
+
+
