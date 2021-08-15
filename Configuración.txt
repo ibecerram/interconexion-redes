@@ -161,16 +161,17 @@ dns 192.168.0.14
 
 ip dhcp excluded-address 172.28.0.222
 
-ip dhcp pool MARKETING
+ip dhcp pool CONFERENCIAS
 network 172.28.0.192 255.255.255.224
 default-router 172.28.0.222
 dns 192.168.0.14
+
 
    >> ADMINISTRACION: 
 
 ip dhcp excluded-address 172.28.0.62
 
-ip dhcp pool MARKETING
+ip dhcp pool ADMINISTRACION
 network 172.28.0.32 255.255.255.224
 default-router 172.28.0.62
 dns 192.168.0.14
@@ -623,6 +624,62 @@ standby 2 preempt
 int g0/0/1
 standby version 2
 standby 2 ip 172.28.0.237
+
+
+
+------------------------------------------------------------
+
+
+
+     +++  Configurar teléfonos IP  +++
+
+
+ >> Incluimos en el DHCP de R-CONFERENCIAS
+
+ip dhcp pool CONFERENCIAS
+option 150 ip 172.28.0.222
+
+
+ >> Configurar el servicio de telefonía Manager Express en R-CONFERENCIAS
+
+telephony-service
+max-dn 5
+max-ephones 5
+ip source-address 172.28.0.222 port 2000
+auto assign 4 to 6
+auto assign 1 to 5
+
+
+ >> Configurar una VLAN de voz en SW-CONFERENCIAS
+
+vlan 150
+name VOZ
+
+int range f0/7-9
+sw mode access
+sw voice vlan 150
+
+
+ >> Configurar directorios telefónicos en R-CONFERENCIAS
+
+ephone-dn 1
+number 54001
+
+ephone-dn 2
+number 54002
+
+ephone-dn 3
+number 54003
+
+
+
+------------------------------------------------------------
+
+
+
+
+
+
 
 
 
