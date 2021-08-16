@@ -323,26 +323,6 @@ no shut
 
  >> R-ISP
 
-no ip route 172.28.0.0 255.255.255.224 s2/0
-no ip route 172.28.0.32 255.255.255.224 s2/0
-no ip route 172.28.0.64 255.255.255.224 s2/0
-no ip route 172.28.0.96 255.255.255.224 s2/0
-no ip route 172.28.0.128 255.255.255.224 s2/0
-no ip route 172.28.0.160 255.255.255.224 s2/0
-no ip route 172.28.0.192 255.255.255.224 s2/0
-no ip route 172.28.0.224 255.255.255.240 s2/0
-no ip route 172.28.0.240 255.255.255.252 s2/0
-no ip route 172.28.0.244 255.255.255.252 s2/0
-no ip route 172.28.0.248 255.255.255.252 s2/0
-no ip route 172.28.0.252 255.255.255.252 s2/0
-no ip route 172.28.1.0 255.255.255.252 s2/0
-no ip route 172.28.1.4 255.255.255.252 s2/0
-no ip route 172.28.1.8 255.255.255.252 s2/0
-no ip route 172.28.1.12 255.255.255.252 s2/0
-
-no ip route 192.168.0.0 255.255.255.248 s2/0
-
-
 ip route 172.28.0.0 255.255.255.224 f6/0
 ip route 172.28.0.32 255.255.255.224 f6/0
 ip route 172.28.0.64 255.255.255.224 f6/0
@@ -652,12 +632,9 @@ auto assign 1 to 5
 
  >> Configurar una VLAN de voz en SW-CONFERENCIAS
 
-vlan 150
-name VOZ
-
 int range f0/7-9
 sw mode access
-sw voice vlan 150
+sw voice vlan 1
 
 
  >> Configurar directorios telefónicos en R-CONFERENCIAS
@@ -677,27 +654,73 @@ number 54003
 
 
 
+     +++  Configuración de IPv6  +++
 
 
+ >> DHCPv6 Stateless en R-ADMINISTRACION
+
+ipv6 unicast-routing
+
+ipv6 dhcp pool DNS_POOL
+dns-server 2001:DB8:CAFE::1
+
+int g0/0/1
+ipv6 address 2001:DB8:BEBE:1::1/64
+no shut
+ipv6 address FE80::1 link-local
+ipv6 nd other-config-flag
+ipv6 dhcp server DNS_POOL
 
 
+ >> DHCPv6 Stateless en R-MARKETING
+
+ipv6 unicast-routing
+
+ipv6 dhcp pool DNS_POOL
+dns-server 2001:DB8:CAFE::1
+
+int g0/0/1
+ipv6 address 2001:DB8:BEBE:2::1/64
+no shut
+ipv6 address FE80::2 link-local
+ipv6 nd other-config-flag
+ipv6 dhcp server DNS_POOL
 
 
+ >> CORE
+
+IPv6: 2001:DB8:BEBE:3::/64
+
+int f0/9
+ipv6 address 2001:DB8:BEBE:3::1/64
+
+int f0/8
+ipv6 address 2001:DB8:BEBE:4::1/64
+
+exit
+
+ipv6 route 2001:DB8:BEBE:1::/64 f0/9
+ipv6 route 2001:DB8:BEBE:2::/64 f0/8
 
 
+ >> R-ADMINISTRACION
+
+int g0/0/0
+ipv6 address 2001:DB8:BEBE:4::2/64
+
+ipv6 route 2001:DB8:BEBE:2::/64 g0/0/0
+ipv6 route 2001:DB8:BEBE:3::/64 g0/0/0
 
 
+ >> R-MARKETING
 
+int g0/0/0
+ipv6 address 2001:DB8:BEBE:3::3/64
 
+exit
 
-
-
-
-
-
-
-
-
+ipv6 route 2001:DB8:BEBE:1::/64 g0/0/0
+ipv6 route 2001:DB8:BEBE:4::/64 g0/0/0
 
 
 
