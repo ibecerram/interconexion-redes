@@ -5,8 +5,107 @@
 ------------------------------------------------------------
 
 
-     +++  Configuración básica  +++
+     +++  Configuración básica switches  +++
 
+** Misma configuración para switches capa 2 y 3, diferente hostname. Configuración:
+
+enable password cisco1
+enable secret cisco
+
+line console 0
+password cisco
+login
+
+
+line vty 0 15
+password cisco
+login
+
+service password-encryption
+
+no ip domain-lookup
+
+line console 0
+exec-timeout 1 30
+login
+
+line vty 0 15
+exec-timeout 1 30
+login
+exit
+
+line console 0
+logging synchronous
+login
+
+line vty 0 15
+logging synchronous
+login
+
+banner motd "Acceso a propiedad de FKI Telecomm. Solo personal autorizado."
+
+username user password cisco
+line console 0
+login local
+exit
+
+line vty 0 15
+login local
+end
+clock set 22:10:10 AUG 15 2021
+wr
+
+
+
+------------------------------------------------------------
+
+
+     +++  Configuración básica routers  +++
+
+
+** Misma configuración en todos los routers, diferente host name. Configuración básica:
+
+security password min-length 8
+enable password cisco123
+enable secret ciscocisco
+
+line console 0
+password ciscocisco
+login
+line vty 0 15
+password ciscocisco
+login
+
+service password-encryption
+no ip domain-lookup
+
+line console 0
+exec-timeout 1 30
+login
+line vty 0 15
+exec-timeout 1 30
+login
+exit
+
+line console 0
+logging synchronous
+login
+line vty 0 15
+logging synchronous
+login
+
+banner motd "Acceso a propiedad de FKI Telecomm. Solo personal autorizado."
+username user password ciscocisco
+
+line console 0
+login local
+exit
+line vty 0 15
+login local
+end
+
+clock set 22:10:10 AUG 15 2021
+wr
 
 
 ------------------------------------------------------------
